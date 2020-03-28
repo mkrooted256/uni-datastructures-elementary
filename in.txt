@@ -1,0 +1,9 @@
+abc
+bcd
+a
+ab
+bcde
+abc
+bdec
+abcd
+end

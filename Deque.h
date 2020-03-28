@@ -3,32 +3,20 @@
 
 #include <algorithm>
 
-namespace Dinorray {
+namespace Deque {
     template<class T>
-    class Node {
+    struct Node {
         Node *prev;
         Node *next;
         T val;
-    public:
+        
         Node() : next(nullptr), prev(nullptr), val() {}
         Node(Node *prev, Node *next) : next(next), prev(prev) {}
-        Node(Node *prev, Node *next, T val) : next(next), prev(prev), val(val) {}
-
-        Node *Next() const {
-            return next;
-        }
-
-        Node *Prev() const {
-            return prev;
-        }
-
-        T Val() const {
-            return val;
-        }
+        Node(Node *prev, Node *next, const T& val) : next(next), prev(prev), val(val) {}
     };
 
     template<class T>
-    class Dinorray {
+    class Deque {
     public:
         class iterator : public std::iterator<std::bidirectional_iterator_tag, T, size_t, const T *, T> {
             Node<T> * node;
@@ -36,16 +24,16 @@ namespace Dinorray {
             explicit iterator(Node<T> * node) : node(node) {}
 
             iterator &operator++() {
-                node = node->Next();
+                node = node->next;
                 return *this;
             }
             iterator &operator--() {
-                node = node->Prev();
+                node = node->prev;
                 return *this;
             }
             bool operator==(iterator other) const { return node == other.node; }
             bool operator!=(iterator other) const { return !(*this == other); }
-            T operator*() const { return node->Val(); }
+            T operator*() const { return node->val; }
 
             // Node access
             Node<T> *getNode() const {
@@ -56,14 +44,14 @@ namespace Dinorray {
             iterator operator+(size_t steps) {
                 auto n = node;
                 for (int i=0; i<steps; i++) {
-                    n = n->Next();
+                    n = n->next;
                 }
                 return iterator(n);
             }
             iterator operator-(size_t steps) {
                 auto n = node;
                 for (int i=0; i<steps; i++) {
-                    n = n->Prev();
+                    n = n->prev;
                 }
                 return iterator(n);
             }
@@ -73,62 +61,75 @@ namespace Dinorray {
     private:
         Node<T> *_begin;
         Node<T> *_end;
+
     public:
         // Setup service border nodes
-        Dinorray() : _begin(new Node<T>()), _end(new Node<T>()) {
-            _begin = Node(nullptr, _end);
-            _end = Node(_begin, nullptr);
+        Deque() : _begin(new Node<T>(nullptr, nullptr)), _end(new Node<T>(nullptr, nullptr)) {
+            _begin->next = _end;
+            _end->prev = _begin;
+        }
+
+        // Copy constructor
+        Deque(const Deque& src): Deque() {
+            auto node = _begin;
+            for(auto i: src) {
+                node->next = new Node<T>(node, _end, i);
+                node = node->next;
+            }
+            _end->prev = node;
         }
 
         // STL utility functions
 
         // Iter, pointing to the first element
-        iterator begin() { return iterator(_begin->Next()); }
+        iterator begin() const { return iterator(_begin->next); }
         // Iter, pointing to the virtual element after the last
-        iterator end() { return iterator(_end); }
+        iterator end() const { return iterator(_end); }
 
         // RIter, pointing to the last element
-        reverse_iterator rbegin() { return iterator(_end->Prev()); }
+        reverse_iterator rbegin() const { return reverse_iterator(_end->prev); }
         // RIter, pointing to virtual element before the first
-        reverse_iterator rend() { return iterator(_begin); }
+        reverse_iterator rend() const { return reverse_iterator(_begin); }
 
         // First and last elements
-        T front() { return _begin->Next()->Val(); }
-        T back() { return _end->Prev()->Val(); }
+        T front() { return _begin->next->val; }
+        T back() { return _end->prev->val; }
 
         // Insert (before)
-        iterator insert(iterator pos, T val) {
-            auto nprev = pos.getNode()->Prev();
-            auto nnext = pos.getNode();
-            auto nnode = new Node<T>(nprev, nnext, val); // New node
-            nprev = Node(nprev->Prev(), nnode, nprev->Val()); // change nprev->next
-            nnext = Node(nnode, nnext->Next(), nnext->Val()); // change nnext->prev
+        iterator insert(iterator pos, const T& val) {
+            auto right = pos.getNode();
+            auto left = right->prev;
+            auto nnode = new Node<T>(left, right, val); // New node
+            left->next = nnode;
+            right->prev = nnode;
             return iterator(nnode);
         }
 
         // Delete
         iterator erase(iterator pos) {
-            auto nprev = pos.getNode()->Prev();
-            auto nnext = pos.getNode();
-            nprev = Node(nprev->Prev(), nnext, nprev->Val()); // change nprev->next
-            nnext = Node(nprev, nnext->Next(), nnext->Val()); // change nnext->prev
-            return iterator(nnext);
+            auto delnode = pos.getNode();
+            auto left = delnode->prev;
+            auto right = delnode->next;
+            left->next = right;
+            right->prev = left;
+            delete delnode;
+            return iterator(right);
         }
 
         // Pushes - insert edge element
-        void push_back(T val) { insert(end()); }
-        void push_front(T val) { insert(begin()); }
+        void push_back(const T& val) { insert(end(), val); }
+        void push_front(const T& val) { insert(begin(), val); }
 
         // Popes - destroys edge element
-        void pop_back() { erase(back()); }
-        void pop_front() { erase(front()); }
+        void pop_back() { erase(end()-1); }
+        void pop_front() { erase(begin()); }
 
         bool empty() {
             // True if there are no elements between virtual edge elements
-            return _begin->Next() == _end;
+            return _end->prev == _begin;
         }
 
-        ~Dinorray() {
+        ~Deque() {
             while (not empty())
                 pop_back();
             delete _begin;

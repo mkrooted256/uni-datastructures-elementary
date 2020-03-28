@@ -1,5 +1,5 @@
-#ifndef LAB3_REMASTERED_DEQUE_H
-#define LAB3_REMASTERED_DEQUE_H
+#ifndef LAB3_REMASTERED_DINORRAY_H
+#define LAB3_REMASTERED_DINORRAY_H
 
 #include <algorithm>
 
@@ -58,18 +58,18 @@ namespace Dinorray {
         // STL utility functions
 
         // Iter, pointing to the first element
-        iterator begin() { return iterator(0); }
+        iterator begin() const  { return iterator(0); }
         // Iter, pointing to the virtual element after the last
-        iterator end() { return iterator(size); }
+        iterator end() const { return iterator(size); }
 
         // RIter, pointing to the last element
-        reverse_iterator rbegin() { return iterator(size-1); }
+        reverse_iterator rbegin() const { return iterator(size-1); }
         // RIter, pointing to virtual element before the first
-        reverse_iterator rend() { return iterator(-1); }
+        reverse_iterator rend() const { return iterator(-1); }
 
         // First and last elements
-        T front() { return mem[0]; }
-        T back() { return mem[size-1]; }
+        const T& front() { return mem[0]; }
+        const T& back() { return mem[size-1]; }
 
         // Insert (before)
         iterator insert(iterator pos, T val) {
@@ -91,12 +91,12 @@ namespace Dinorray {
         }
 
         // Pushes - insert edge element
-        void push_back(T val) { insert(end()); }
-        void push_front(T val) { insert(begin()); }
+        void push_back(T val) { insert(end(), val); }
+        void push_front(T val) { insert(begin(), val); }
 
         // Popes - destroys edge element
-        void pop_back() { erase(back()); }
-        void pop_front() { erase(front()); }
+        void pop_back() { erase(end()-1); }
+        void pop_front() { erase(begin()); }
 
         bool empty() {
             // True if there are no elements between virtual edge elements
@@ -110,4 +110,4 @@ namespace Dinorray {
     };
 }
 
-#endif //LAB3_REMASTERED_DEQUE_H
+#endif //LAB3_REMASTERED_DINORRAY_H
