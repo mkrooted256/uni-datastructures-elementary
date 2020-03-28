@@ -96,20 +96,6 @@ namespace Dinorray {
         T front() { return _begin->Next()->Val(); }
         T back() { return _end->Prev()->Val(); }
 
-        // Pushes - insert edge element
-        void push_back(T val) {
-            auto nprev = _end->Prev();
-            Node<T> * nnode = new Node(nprev, _end, val);
-            nprev = Node(nprev->Prev(), nnode, nprev->Val()); // change nprev->next
-            _end = Node(nnode, nullptr); // change _end->prev
-        }
-        void push_front(T val) {
-            auto nnext = _begin->Prev();
-            Node<T> * nnode = new Node(_begin, nnext, val);
-            _begin = Node(nnode, nullptr); // change _begin->next
-            nnext = Node(nnode, nnext->Next(), nnext->Val()); // change nnext->prev
-        }
-
         // Insert (before)
         iterator insert(iterator pos, T val) {
             auto nprev = pos.getNode()->Prev();
@@ -128,6 +114,10 @@ namespace Dinorray {
             nnext = Node(nprev, nnext->Next(), nnext->Val()); // change nnext->prev
             return iterator(nnext);
         }
+
+        // Pushes - insert edge element
+        void push_back(T val) { insert(end()); }
+        void push_front(T val) { insert(begin()); }
 
         // Popes - destroys edge element
         void pop_back() { erase(back()); }
