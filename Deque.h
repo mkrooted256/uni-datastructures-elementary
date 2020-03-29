@@ -9,30 +9,36 @@ namespace Deque {
         Node *prev;
         Node *next;
         T val;
-        
+
         Node() : next(nullptr), prev(nullptr), val() {}
+
         Node(Node *prev, Node *next) : next(next), prev(prev) {}
-        Node(Node *prev, Node *next, const T& val) : next(next), prev(prev), val(val) {}
+
+        Node(Node *prev, Node *next, const T &val) : next(next), prev(prev), val(val) {}
     };
 
     template<class T>
     class Deque {
     public:
         class iterator : public std::iterator<std::bidirectional_iterator_tag, T, size_t, const T *, T> {
-            Node<T> * node;
+            Node<T> *node;
         public:
-            explicit iterator(Node<T> * node) : node(node) {}
+            explicit iterator(Node<T> *node) : node(node) {}
 
             iterator &operator++() {
                 node = node->next;
                 return *this;
             }
+
             iterator &operator--() {
                 node = node->prev;
                 return *this;
             }
+
             bool operator==(iterator other) const { return node == other.node; }
+
             bool operator!=(iterator other) const { return !(*this == other); }
+
             T operator*() const { return node->val; }
 
             // Node access
@@ -43,20 +49,23 @@ namespace Deque {
             // Movement
             iterator operator+(size_t steps) {
                 auto n = node;
-                for (int i=0; i<steps; i++) {
+                for (int i = 0; i < steps; i++) {
                     n = n->next;
                 }
                 return iterator(n);
             }
+
             iterator operator-(size_t steps) {
                 auto n = node;
-                for (int i=0; i<steps; i++) {
+                for (int i = 0; i < steps; i++) {
                     n = n->prev;
                 }
                 return iterator(n);
             }
         };
-        class reverse_iterator : public std::reverse_iterator<iterator> {};
+
+        class reverse_iterator : public std::reverse_iterator<iterator> {
+        };
 
     private:
         Node<T> *_begin;
@@ -77,9 +86,9 @@ namespace Deque {
         }
 
         // Copy constructor
-        Deque(const Deque& src): Deque() {
+        Deque(const Deque &src) : Deque() {
             auto node = _begin;
-            for(auto i: src) {
+            for (auto i: src) {
                 node->next = new Node<T>(node, _end, i);
                 node = node->next;
             }
@@ -87,14 +96,14 @@ namespace Deque {
         }
 
         // Assignment operator
-        Deque& operator=(const Deque& rhs) {
+        Deque &operator=(const Deque &rhs) {
             if (this != &rhs) {
                 recycle();
                 _begin = new Node<T>(nullptr, nullptr);
                 _end = new Node<T>(nullptr, nullptr);
-                _begin -> next = _end;
+                _begin->next = _end;
                 auto node = _begin;
-                for(auto i: rhs) {
+                for (auto i: rhs) {
                     node->next = new Node<T>(node, _end, i);
                     node = node->next;
                 }
@@ -108,20 +117,23 @@ namespace Deque {
 
         // Iter, pointing to the first element
         iterator begin() const { return iterator(_begin->next); }
+
         // Iter, pointing to the virtual element after the last
         iterator end() const { return iterator(_end); }
 
         // RIter, pointing to the last element
         reverse_iterator rbegin() const { return reverse_iterator(_end->prev); }
+
         // RIter, pointing to virtual element before the first
         reverse_iterator rend() const { return reverse_iterator(_begin); }
 
         // First and last elements
         T front() { return _begin->next->val; }
+
         T back() { return _end->prev->val; }
 
         // Insert (before)
-        iterator insert(iterator pos, const T& val) {
+        iterator insert(iterator pos, const T &val) {
             auto right = pos.getNode();
             auto left = right->prev;
             auto nnode = new Node<T>(left, right, val); // New node
@@ -142,11 +154,13 @@ namespace Deque {
         }
 
         // Pushes - insert edge element
-        void push_back(const T& val) { insert(end(), val); }
-        void push_front(const T& val) { insert(begin(), val); }
+        void push_back(const T &val) { insert(end(), val); }
+
+        void push_front(const T &val) { insert(begin(), val); }
 
         // Popes - destroys edge element
-        void pop_back() { erase(end()-1); }
+        void pop_back() { erase(end() - 1); }
+
         void pop_front() { erase(begin()); }
 
         bool empty() {
@@ -161,8 +175,8 @@ namespace Deque {
     };
 }
 
-template <class T>
-std::ostream& operator<<(std::ostream& os, Deque::Deque<T> &dq) {
+template<class T>
+std::ostream &operator<<(std::ostream &os, const Deque::Deque<T> &dq) {
     for (auto i: dq) {
         os << i << " ";
     }

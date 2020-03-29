@@ -28,9 +28,9 @@ void test_deque() {
     dq.push_back(2);
     dq.push_back(3);
     std::cout << dq << std::endl;
-    dq.erase(dq.begin()+1);
+    dq.erase(dq.begin() + 1);
     std::cout << dq << std::endl;
-    dq.insert(dq.begin()+1, 9);
+    dq.insert(dq.begin() + 1, 9);
     std::cout << dq << std::endl;
     dq.push_front(0);
     dq.push_front(-1);

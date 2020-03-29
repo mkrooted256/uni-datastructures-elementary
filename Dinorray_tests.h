@@ -59,23 +59,24 @@ void test_complex_array() {
     struct Tester {
         int label{0};
 
-        Tester(int label): label(label) {
+        Tester(int label) : label(label) {
             std::cout << "+" << label << " ";
         }
+
         Tester() {
             std::cout << "+" << label << " ";
         }
 
-        Tester(const Tester& src): label(src.label) {
+        Tester(const Tester &src) : label(src.label) {
             std::cout << "||" << label << " ";
         }
 
-        Tester(Tester&& src): label(src.label) {
+        Tester(Tester &&src) : label(src.label) {
             std::cout << "=>" << label << " ";
         }
 
-        Tester& operator=(const Tester& src) {
-            if( this != &src ) {
+        Tester &operator=(const Tester &src) {
+            if (this != &src) {
                 label = src.label;
                 std::cout << "=" << label << " ";
             }

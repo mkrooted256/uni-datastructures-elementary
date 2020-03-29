@@ -6,11 +6,16 @@
 #include "Deque_tests.h"
 #include "Dinorray_tests.h"
 
+#include "Queue.h"
+#include "Stack.h"
+
+#include "Mathparser.h"
+
 namespace lab3_list {
     typedef Deque::Deque<char> Word;
     typedef Deque::Deque<Word> Sentence;
 
-    bool is_alphabetical(Word& w) {
+    bool is_alphabetical(Word &w) {
         char c = 'a';
         for (auto i: w) {
             if (i != c) return false;
@@ -19,7 +24,7 @@ namespace lab3_list {
         return true;
     }
 
-    bool operator==(const Word& a, const Word& b) {
+    bool operator==(const Word &a, const Word &b) {
         auto i = a.begin(), j = b.begin();
         for (; i != a.end() and j != b.end(); ++i, ++j) {
             if (*i != *j) return false;
@@ -27,7 +32,7 @@ namespace lab3_list {
         return i == a.end() and j == b.end();
     }
 
-    std::ostream& operator<<(std::ostream& o, Word& w) {
+    std::ostream &operator<<(std::ostream &o, Word &w) {
         for (auto i: w)
             o << i;
         return o;
@@ -36,7 +41,7 @@ namespace lab3_list {
     void task() {
         Sentence sentence;
 
-        std::ifstream in("in.txt");
+        std::ifstream in("in-lab3.txt");
         in >> std::noskipws;
         char c;
         while (true) {
@@ -62,7 +67,7 @@ namespace lab3_list {
         }
         Word first = sentence.front();
         for (auto w: sentence) {
-            if (is_alphabetical(w) and not (w == first)) {
+            if (is_alphabetical(w) and not(w == first)) {
                 w.pop_front();
                 w.push_back('.');
                 std::cout << w << std::endl;
@@ -75,7 +80,7 @@ namespace lab3_array {
     typedef Dinorray::Dinorray<char> Word;
     typedef Dinorray::Dinorray<Word> Sentence;
 
-    bool is_alphabetical(Word& w) {
+    bool is_alphabetical(Word &w) {
         char c = 'a';
         for (auto i: w) {
             if (i != c) return false;
@@ -84,7 +89,7 @@ namespace lab3_array {
         return true;
     }
 
-    bool operator==(const Word& a, const Word& b) {
+    bool operator==(const Word &a, const Word &b) {
         auto i = a.begin(), j = b.begin();
         for (; i != a.end() and j != b.end(); ++i, ++j) {
             if (*i != *j) return false;
@@ -92,7 +97,7 @@ namespace lab3_array {
         return i == a.end() and j == b.end();
     }
 
-    std::ostream& operator<<(std::ostream& o, Word& w) {
+    std::ostream &operator<<(std::ostream &o, Word &w) {
         for (auto i: w)
             o << i;
         return o;
@@ -101,7 +106,7 @@ namespace lab3_array {
     void task() {
         Sentence sentence;
 
-        std::ifstream in("in.txt");
+        std::ifstream in("in-lab3.txt");
         in >> std::noskipws;
         char c;
         while (true) {
@@ -127,7 +132,7 @@ namespace lab3_array {
         }
         Word first = sentence.front();
         for (auto w: sentence) {
-            if (is_alphabetical(w) and not (w == first)) {
+            if (is_alphabetical(w) and not(w == first)) {
                 w.pop_front();
                 w.push_back('.');
                 std::cout << w << std::endl;
@@ -136,11 +141,36 @@ namespace lab3_array {
     }
 }
 
+namespace lab4 {
+    void mathparsing_task() {
+        std::string input[] = {
+                "(3-((4+5)*(6-7)))+(2+1)",
+                "1+2",
+                "1+(4+5)",
+                "(1+2)*(4+5)",
+                "(1+2)*5",
+                "(1+2)*(3+(4+5))",
+                "(1+2)*((3+4)+5)",
+                "((3+4)+5)*(1+2)",
+                "(5-(3+4))*(1+2)",
+                "1*((5-(3+4))*(1+2))",
+                "((5-(3+4))*(1+2))*1",
+        };
+
+        for (const auto &s: input) {
+            MathStatement ms = build_from_infix(s);
+            std::cout << ms.getLine() << " = " << ms.compute() << std::endl;
+        }
+    }
+}
+
 int main() {
-    std::cout << "List task:" << std::endl;
-    lab3_list::task();
-    std::cout << std::endl << "Array task:" << std::endl;
-    lab3_array::task();
+//    std::cout << "List task:" << std::endl;
+//    lab3_list::task();
+//    std::cout << std::endl << "Array task:" << std::endl;
+//    lab3_array::task();
+
+    lab4::mathparsing_task();
 
 //    test_deque();
 //    std::cout<<" -------- " << std::endl;
