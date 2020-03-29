@@ -62,6 +62,13 @@ namespace Deque {
         Node<T> *_begin;
         Node<T> *_end;
 
+        void recycle() {
+            while (not empty())
+                pop_back();
+            delete _begin;
+            delete _end;
+        }
+
     public:
         // Setup service border nodes
         Deque() : _begin(new Node<T>(nullptr, nullptr)), _end(new Node<T>(nullptr, nullptr)) {
@@ -78,6 +85,24 @@ namespace Deque {
             }
             _end->prev = node;
         }
+
+        // Assignment operator
+        Deque& operator=(const Deque& rhs) {
+            if (this != &rhs) {
+                recycle();
+                _begin = new Node<T>(nullptr, nullptr);
+                _end = new Node<T>(nullptr, nullptr);
+                _begin -> next = _end;
+                auto node = _begin;
+                for(auto i: rhs) {
+                    node->next = new Node<T>(node, _end, i);
+                    node = node->next;
+                }
+                _end->prev = node;
+            }
+            return *this;
+        }
+
 
         // STL utility functions
 
@@ -130,13 +155,18 @@ namespace Deque {
         }
 
         ~Deque() {
-            while (not empty())
-                pop_back();
-            delete _begin;
-            delete _end;
+            recycle();
         }
 
     };
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& os, Deque::Deque<T> &dq) {
+    for (auto i: dq) {
+        os << i << " ";
+    }
+    return os;
 }
 
 #endif //LAB3_REMASTERED_DEQUE_H

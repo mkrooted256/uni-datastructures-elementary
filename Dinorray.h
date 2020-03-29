@@ -12,8 +12,11 @@ namespace Dinorray {
     public:
         class iterator : public std::iterator<std::random_access_iterator_tag, T, size_t, const T *, T> {
              size_t index;
+             T * mem;
+
+            iterator(size_t index, T * mem) : index(index), mem(mem) {}
         public:
-            explicit iterator(size_t index) : index(index) {}
+            iterator(size_t index, const Dinorray& rr) : index(index), mem(rr.mem) {}
 
             iterator &operator++() {
                 index++;
@@ -25,6 +28,9 @@ namespace Dinorray {
             }
             T operator*() const { return mem[index]; }
 
+            bool operator==(iterator other) const { return index == other.index and mem == other.mem; }
+            bool operator!=(iterator other) const { return !(*this == other); }
+
             // Access index
             size_t getIndex() const {
                 return index;
@@ -32,18 +38,17 @@ namespace Dinorray {
 
             // Movement
             iterator operator+(size_t steps) {
-                return iterator(index + steps);
+                return iterator(index + steps, mem);
             }
             iterator operator-(size_t steps) {
-                return iterator(index - steps);
+                return iterator(index - steps, mem);
             }
             iterator operator-(iterator rhs) {
-                return iterator(index - rhs.index);
+                return iterator(index - rhs.index, mem);
             }
         };
         class reverse_iterator : public std::reverse_iterator<iterator> {};
 
-    private:
         void reserve(size_t newcap) {
             auto newmem = new T[newcap];
             memcpy(newmem, mem, capacity * sizeof(T));
@@ -52,20 +57,36 @@ namespace Dinorray {
             mem = newmem;
         }
 
-    public:
         explicit Dinorray(size_t init_cap=16) : mem(new T[init_cap]), size(0), capacity(init_cap) {}
+
+        // Copy constructor
+        Dinorray(const Dinorray& src) : mem(new T[src.capacity]), size(src.size), capacity(src.capacity) {
+            memcpy(mem, src.mem, capacity * sizeof(T));
+        }
+
+        // Assignment operator
+        Dinorray& operator=(const Dinorray& rhs) {
+            if (this != &rhs) {
+                delete [] mem;
+                mem = new T[rhs.capacity];
+                size = rhs.size;
+                capacity = rhs.capacity;
+                memcpy(mem, rhs.mem, capacity * sizeof(T));
+            }
+            return *this;
+        }
 
         // STL utility functions
 
         // Iter, pointing to the first element
-        iterator begin() const  { return iterator(0); }
+        iterator begin() const  { return iterator(0, *this); }
         // Iter, pointing to the virtual element after the last
-        iterator end() const { return iterator(size); }
+        iterator end() const { return iterator(size, *this); }
 
         // RIter, pointing to the last element
-        reverse_iterator rbegin() const { return iterator(size-1); }
+        reverse_iterator rbegin() const { return iterator(size-1, *this); }
         // RIter, pointing to virtual element before the first
-        reverse_iterator rend() const { return iterator(-1); }
+        reverse_iterator rend() const { return iterator(-1, *this); }
 
         // First and last elements
         const T& front() { return mem[0]; }
@@ -77,22 +98,24 @@ namespace Dinorray {
                 reserve(capacity * 2);
 
             auto ipos = pos.getIndex();
-            memmove(mem+ipos+1, mem+ipos, size-ipos);
+            memmove(mem+ipos+1, mem+ipos, (size-ipos)*sizeof(T));
             mem[ipos] = val;
+            size++;
 
-            return iterator(ipos+1);
+            return iterator(ipos+1, *this);
         }
 
         // Delete
         iterator erase(iterator pos) {
             auto ipos = pos.getIndex();
-            memmove(mem+ipos, mem+ipos+1, size-ipos-1);
-            return iterator(ipos);
+            memmove(mem+ipos, mem+ipos+1, (size-ipos-1)*sizeof(T));
+            size--;
+            return iterator(ipos, *this);
         }
 
         // Pushes - insert edge element
-        void push_back(T val) { insert(end(), val); }
-        void push_front(T val) { insert(begin(), val); }
+        void push_back(const T& val) { insert(end(), val); }
+        void push_front(const T& val) { insert(begin(), val); }
 
         // Popes - destroys edge element
         void pop_back() { erase(end()-1); }
@@ -108,6 +131,14 @@ namespace Dinorray {
         }
 
     };
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& os, Dinorray::Dinorray<T> &rr) {
+    for (auto i: rr) {
+        os << i << " ";
+    }
+    return os;
 }
 
 #endif //LAB3_REMASTERED_DINORRAY_H
