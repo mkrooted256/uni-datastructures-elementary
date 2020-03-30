@@ -2,9 +2,11 @@
 #include <fstream>
 #include "Deque.h"
 #include "Dinorray.h"
+#include "CircularDeque.h"
 
 #include "Deque_tests.h"
 #include "Dinorray_tests.h"
+#include "CircularDeque_tests.h"
 
 #include "Queue.h"
 #include "Stack.h"
@@ -155,6 +157,7 @@ namespace lab4 {
                 "(5-(3+4))*(1+2)",
                 "1*((5-(3+4))*(1+2))",
                 "((5-(3+4))*(1+2))*1",
+                "8/4",
         };
 
         for (const auto &s: input) {
@@ -170,8 +173,8 @@ int main() {
 //    std::cout << std::endl << "Array task:" << std::endl;
 //    lab3_array::task();
 
-    lab4::mathparsing_task();
-
+//    lab4::mathparsing_task();
+//
 //    test_deque();
 //    std::cout<<" -------- " << std::endl;
 //    test_complex_deque();
@@ -179,6 +182,37 @@ int main() {
 //    test_array();
 //    std::cout<<" -------- " << std::endl;
 //    test_complex_array();
+
+    // Lab 3 additional tasks
+    // Deque
+//    Deque::Deque<int> dq;
+//    dq.push_back(1);
+//    dq.push_back(99);
+//    dq.push_back(2);
+//    dq.push_back(3);
+//    std::cout << dq << std::endl;
+//    dq.erase(dq.end()-3);
+//    std::cout << dq << std::endl;
+//    // Array
+//    Dinorray::Dinorray<int> rr;
+//    rr.push_back(1);
+//    rr.push_back(99);
+//    rr.push_back(2);
+//    rr.push_back(3);
+//    std::cout << rr << std::endl;
+//    rr.erase(rr.end()-3);
+//    std::cout << rr << std::endl;
+//
+//    std::cout << " ============= " << std::endl;
+
+    // Circular Deque test
+//    test_circular_deque();
+//    test_complex_circular_deque();
+//    std::cout << " ------ " << std::endl;
+//    test_circularity_of_cdq();
+//    std::cout << " ------ " << std::endl;
+//    test_circular_queue();
+//    std::cout << " ------ " << std::endl;
 
     return 0;
 }

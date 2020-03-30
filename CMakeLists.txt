@@ -3,4 +3,4 @@ project(lab3_remastered)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(lab3_remastered main.cpp Deque.h Dinorray.h Deque_tests.h Dinorray_tests.h Queue.h Stack.h Mathparser.h)
+add_executable(lab3_remastered main.cpp Deque.h Dinorray.h Deque_tests.h Dinorray_tests.h Queue.h Stack.h Mathparser.h CircularDeque.h CircularDeque_tests.h)
